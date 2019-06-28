@@ -101,7 +101,7 @@ function generatePrice() {
 var TYPE = [
   "palace",
   "flat",
-  "ho use",
+  "house",
   "bungalo"
 ];
 
@@ -163,7 +163,7 @@ function generateFeatures() {
 
   }
 
-  return result;
+  return result.filter(predicate);
 }
 
 //1.2.2.10
@@ -175,7 +175,7 @@ function generateDescription() {
 var PHOTOS = [
   "http://o0.github.io/assets/images/tokyo/hotel1.jpg",
   "http://o0.github.io/assets/images/tokyo/hotel2.jpg",
-  "http://o0.github .io/assets/images/tokyo/hotel3.jpg"
+  "http://o0.github.io/assets/images/tokyo/hotel3.jpg"
 ];
 
 // функция-сравниватель для функции сортировки
@@ -194,6 +194,8 @@ function generatePhotos() {
 
   return randomizedArray;
 }
+
+//1.2.3
 
 var result = [];
 
@@ -266,10 +268,58 @@ var mapCardElement = mapCard.cloneNode(true);
 // достать из массива со сгенерированными картинками нулевой элемент
 var firstElement = result[0];
 
+// ================ ГЕНЕРАЦИЯ ДАННЫХ ===========================================
+
 mapCardElement.querySelector(".popup__title").textContent = firstElement.offer.title;
 mapCardElement.querySelector(".popup__text--address").textContent = firstElement.offer.address;
 mapCardElement.querySelector(".popup__text--price").textContent = firstElement.offer.price + "₽/ночь";
-mapCardElement.querySelector(".popup__text--type").textContent = firstElement.offer.type;
+
+var names = {
+  bungalo: 'Бунгало',
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+};
+
+mapCardElement.querySelector(".popup__type").textContent = names[firstElement.offer.type];
 mapCardElement.querySelector(".popup__text--capacity").textContent = firstElement.offer.rooms + " комнаты для " + firstElement.offer.guests + " гостей";
 mapCardElement.querySelector(".popup__text--time").textContent = "Заезд после " + firstElement.offer.checkin + ", выезд до " + firstElement.offer.checkout;
-mapCardElement.querySelector(".popup__text--features").textContent = firstElement.offer.type;
+
+function predicate(element) {
+  if (element === undefined) return false;
+  return true;
+}
+
+mapCardElement.querySelector(".popup__features").innerHTML = '';// очистить блок popup__features перед вставкой li
+
+for (var i = 0; i < firstElement.offer.features.length; i++) {
+  var li = document.createElement('li'); // создание элемента li в памяти
+
+  li.classList.add("popup__feature");
+  li.classList.add("popup__feature--" + firstElement.offer.features[i]);
+
+  mapCardElement.querySelector(".popup__features").appendChild(li); // вставить сгенерированную картинку в блок popup__features
+}
+
+mapCardElement.querySelector(".popup__description").textContent = firstElement.offer.description;
+
+mapCardElement.querySelector(".popup__photos").innerHTML = ''; // очистить блок popup__photos перед вставкой картинок (в шаблоне лежит демо-картинка)
+
+// цикл по всем элементам массива с фотками
+for (var i = 0; i < firstElement.offer.photos.length; i++) {
+  var photo = document.createElement('img'); // создание элемента img в памяти
+
+  photo.classList.add("popup__photo");
+  photo.src = firstElement.offer.photos[i];
+  photo.width = "45";
+  photo.height = "40";
+
+  mapCardElement.querySelector(".popup__photos").appendChild(photo); // вставить сгенерированную картинку в блок popup__photos
+}
+
+mapCardElement.querySelector(".popup__avatar").src = firstElement.author.avatar;
+
+var parentElement = document.querySelector(".map");
+var childElement = document.querySelector(".map__filters-container");
+
+parentElement.insertBefore(mapCardElement, childElement);
